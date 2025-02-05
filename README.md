@@ -1,44 +1,37 @@
 # `reconcile`
 
-A powerful tool for reconciling names across multiple data sources using AI-powered fuzzy matching and Google Sheets integration.
-
-## Overview 📖
-
-This tool helps you match and reconcile names across different datasets using advanced AI models. It's particularly useful when dealing with:
-
--   Multiple variations of the same name
--   Misspellings and typos
--   Different formatting conventions
--   Large datasets requiring automated matching
+A tool for reconciling names across multiple data sources using AI-powered fuzzy matching and Google Sheets integration.
 
 ## Features ✨
 
 -   AI-powered fuzzy name matching
+    -   Using GPT-4o, Claude 3, or other models
 -   Integration with Google Sheets for input and output
 -   Configurable matching parameters
 -   Support for multiple reference lists
 -   Confidence scoring for matches
--   Batch processing capabilities
--   Caching system for improved performance
+-   Model caching system for improved performance
 
-## Requirements 🛠️
+## Quickstart 🚀
 
--   Python ^3.12
--   Google Sheets API access
--   Valid Google API credentials
--   Required Python packages:
-    -   googleapiutils2
-    -   pandas
-    -   litellm
-    -   loguru
+This project requires Python `^3.12` to run.
 
-## Quick Start 🚀
+### via [`poetry`](https://python-poetry.org/docs/)
+
+Install poetry, then run
+
+> poetry install
+
+And you're done.
+
+### Usage
 
 1. Create a `config.toml` file with your settings:
 
 ```toml
 google_credentials = "path/to/credentials.json"
-model_name = "your-ai-model"
+model_credentials = "your-model-api-key" # optional, only needed for some models
+model_name = "your-ai-model" # must be supported by litellm
 system_prompt = "Your matching context here"
 
 [input_sheet]
@@ -66,6 +59,14 @@ from main import main
 main(config_path=Path("./config.toml"))
 ```
 
+Or via running the script directly:
+
+```bash
+poetry run python reconcile --config ./config.toml
+```
+
+To leverage a given model (ChatGPT, Claude, etc.), you'll need to add your respective API key to the above config. For Google Sheets, you'll need to set up a service account and download the credentials JSON file; see the [`googleapiutils2`](https://github.com/mkbabb/googleapiutils2) repo for more information.
+
 ## Configuration 🔧
 
 The tool is configured using a TOML file with the following sections:
@@ -73,11 +74,12 @@ The tool is configured using a TOML file with the following sections:
 ### Core Settings
 
 -   `google_credentials`: Path to Google API credentials file
+-   `model_credentials`: API key for the AI model
 -   `model_name`: AI model to use for matching
 -   `system_prompt`: Context provided to the AI for matching
 -   `batch_size`: Optional batch size for processing
--   `include_references`: Include reference data in output
--   `include_input`: Include input data in output
+-   `include_references`: Include reference data rows in output
+-   `include_input`: Include input data rows in output
 
 ### Sheet Configurations
 
@@ -113,30 +115,7 @@ The tool generates an output with the following columns:
 -   Name: Original input name
 -   Matched Name: Best match found
 -   Match Index: Index in reference data
--   Confidence: Match confidence score (0-1)
+-   Confidence: Match confidence score, based on Python's difflib (Levenshtein distance & c) (0-1)
 -   Additional columns based on configuration
-
-## Best Practices 💡
-
-1. **Reference Data Quality**:
-
-    - Keep reference lists well-maintained and standardized
-    - Remove duplicates and inconsistencies
-    - Include common variations where possible
-
-2. **Performance Optimization**:
-
-    - Use batch processing for large datasets
-    - Leverage caching for repeated matches
-    - Monitor and adjust batch sizes as needed
-
-3. **Match Validation**:
-    - Review matches with low confidence scores
-    - Maintain a list of known exceptions
-    - Regularly update reference data based on findings
-
-## Match Quality Issues 🔧
-
-    - Adjust system prompt for better context
-    - Review and clean reference data
-    - Consider lowering batch size for more accurate matching
+    -   Reference data: row data from the matched reference
+    -   Input data: row data from the input
