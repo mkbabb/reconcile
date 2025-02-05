@@ -1,23 +1,39 @@
 [tool.poetry]
 name = "reconcile"
 version = "0.1.0"
-description = ""
+description = "Reconcile a list of things against a set of indicies"
 authors = ["Mike Babb <mike7400@gmail.com>"]
+
 readme = "README.md"
 
+keywords = [
+    "google",
+    "googleapi",
+    "google-api",
+    "fuzzy-match",
+    "fuzzy",
+    "fuzz-find",
+    "reconcile",
+    "match",
+    "matching",
+]
+
+license = "MIT"
+
+
 [tool.poetry.dependencies]
-python = ">=3.12,<3.14"
+python = "^3.12"
 pandas = "^2.2.3"
 loguru = "^0.7.2"
 litellm = "^1.56.8"
 googleapiutils2 = "^0.16.0"
+mypy = "^1.15.0"
 
 
 [tool.poetry.group.dev.dependencies]
 xlrd = "^2.0.1"
 black = "^24.10.0"
 pandas-stubs = "^2.2.3.241126"
-
 
 
 [build-system]
