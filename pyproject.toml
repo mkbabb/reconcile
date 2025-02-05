@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "reconcile"
+version = "0.1.0"
+description = ""
+authors = ["Mike Babb <mike7400@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.14"
+pandas = "^2.2.3"
+loguru = "^0.7.2"
+litellm = "^1.56.8"
+googleapiutils2 = "^0.16.0"
+
+
+[tool.poetry.group.dev.dependencies]
+xlrd = "^2.0.1"
+black = "^24.10.0"
+pandas-stubs = "^2.2.3.241126"
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
