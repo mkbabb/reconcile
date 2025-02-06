@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import difflib
+import pprint
 from dataclasses import dataclass, field
 from typing import Any, Callable, Generator, Hashable
 
@@ -10,35 +11,23 @@ from googleapiutils2 import cache_with_stale_interval
 from litellm import completion
 from loguru import logger
 
-from reconcile.utils import (
+from src.utils import (
     Model,
     handle_response,
 )
 
 
 @dataclass
-class ReconcileResult:
-    """Result of name reconciliation with match details"""
+class Confidence:
+    """Confidence score for a match"""
 
-    input_name: str  # Original input name
-    matched_name: str | None  # Successfully matched name
-    match_ix: int | None  # Index in reference data
-    match_list_ix: int | None  # Index of matching list
-    model: Model | None  # AI model used for matching
-    confidence: float  # Match confidence score
-    metadata: dict[str, Any] = field(default_factory=dict)  # Additional match metadata
+    difflib: float = 0.0
+    model: float = 0.0
 
-
-# Type definitions for matching functions
-MatchFunction = Callable[
-    [str, list[str], str | None],
-    tuple[int, str] | None,
-]
-
-ModelMatchFunction = Callable[
-    [str, list[str], Model, str | None],
-    tuple[int, str] | None,
-]
+    @property
+    def percent(self) -> float:
+        """Calculate average confidence"""
+        return (self.difflib * 0.8 + self.model * 1.2) / 2
 
 
 @dataclass
@@ -47,21 +36,57 @@ class MatchResult:
 
     index: int  # Match index
     name: str  # Matched name
-    percent: float  # Match confidence
+    confidence: Confidence  # Match confidence
 
 
-@cache_with_stale_interval(datetime.timedelta(days=1))
+@dataclass
+class ReconcileResult:
+    """Result of name reconciliation with match details"""
+
+    input_name: str  # Original input name
+
+    matched_name: str  # Successfully matched name
+
+    match_ix: int  # Index in reference data
+
+    match_list_ix: int  # Index of matching list
+
+    model: Model  # AI model used for matching
+
+    confidence: Confidence  # Match confidence
+
+    metadata: dict[str, Any] = field(default_factory=dict)  # Additional match metadata
+
+
+# Type definitions for matching functions
+MatchFunction = Callable[
+    [str, list[str], str | None],
+    MatchResult | None,
+]
+
+ModelMatchFunction = Callable[
+    [str, list[str], Model, str | None],
+    MatchResult | None,
+]
+
+
+# @cache_with_stale_interval(datetime.timedelta(days=1))
 def find_match(
     input_name: str,
     match_list: list[str],
     model: Model,
     context: str | None = None,
-) -> tuple[int, str] | None:
-    """AI-powered fuzzy matching with caching"""
+) -> MatchResult | None:
+
     # Try exact match first
     try:
         match_ix = match_list.index(input_name)
-        return match_ix, input_name
+
+        logger.info(f"Exact match found: '{input_name}'")
+
+        return MatchResult(
+            index=match_ix, name=input_name, confidence=Confidence(model=1.0)
+        )
     except ValueError:
         pass
 
@@ -74,15 +99,18 @@ def find_match(
 
     Use your reason to find the best match, and return the best match as a JSON object with the following properties:
     
-    - best_match: The best match, a list of the best match or matches from the **MATCH LIST VERBATIM, NOT FROM THE INPUT NAME**. 
-                  If no match is found, return an empty list.
+    - best_match (list[str]): The best match, a list of the best match, or matches, from the **MATCH LIST VERBATIM, NOT FROM THE INPUT NAME**. 
+                  If a **REASONABLE** match is not found, return an empty list. Don't overthink it, just use your intuition.
+    - confidence (float): An approximate confidence of the match, a number between 0 and 1.
+
+    You **MUST** only include values from the match-list in the best_match list.
+
 
     {context}
 """
 
     # Format content for AI
     content = f"""Input-name: {input_name}
-    
     Match-list:
     {match_list_str}
     """
@@ -115,7 +143,16 @@ def find_match(
 
         match_ix = match_list.index(match_name)
 
-        return match_ix, match_name
+        confidence: float = data.get("confidence", 0.0)
+
+        logger.info(f"Match found: '{input_name}' -> '{match_name}'")
+
+        return MatchResult(
+            index=match_ix,
+            name=match_name,
+            confidence=Confidence(model=confidence),
+        )
+
     except Exception as e:
         logger.error(f"Error processing match: {e}")
         return None
@@ -144,7 +181,7 @@ class ModelNameReconciler:
         match_func: ModelMatchFunction,
     ) -> MatchResult | None:
         """Process single match attempt with one model"""
-        match: tuple[int, str] | None = match_func(  # type: ignore
+        match: MatchResult | None = match_func(  # type: ignore
             name,
             match_list_names,
             model=model,
@@ -155,13 +192,14 @@ class ModelNameReconciler:
             logger.warning("No match found.")
             return None
 
-        # Calculate match confidence
-        temp_match_ix, match_name = match
-        match_ix = match_list_indices[temp_match_ix]
-        match_percent = difflib.SequenceMatcher(None, name, match_name).ratio()
+        match.index = match_list_indices[match.index]
 
-        logger.success(f"Match found: {match_name}")
-        return MatchResult(match_ix, match_name, match_percent)
+        # Calculate match confidence with difflib
+        difflib_confidence = difflib.SequenceMatcher(None, name, match.name).ratio()
+
+        match.confidence.difflib = difflib_confidence
+
+        return match
 
     def _reconcile_models_matches(
         self,
@@ -172,6 +210,8 @@ class ModelNameReconciler:
         """Try matching across all models and match lists"""
         if pd.isna(name):
             return None
+
+        results: list[ReconcileResult] = []
 
         # Iterate through match lists and models
         for match_list_ix, (names_indices, names_values) in enumerate(
@@ -189,16 +229,35 @@ class ModelNameReconciler:
                     continue
 
                 # Return successful match result
-                return ReconcileResult(
+                result = ReconcileResult(
                     input_name=name,
                     matched_name=match_result.name,
                     match_ix=match_result.index,
                     match_list_ix=match_list_ix,
                     model=model,
-                    confidence=match_result.percent,
+                    confidence=match_result.confidence,
                 )
 
-        return None
+                results.append(result)
+
+        if not results:
+            return None
+
+        results.sort(key=lambda r: r.confidence.percent, reverse=True)
+
+        best_result = results[0]
+
+        # log the sorted list of results with their confidence:
+        for result in results:
+            logger.info(
+                f"Matched '{result.input_name}' -> '{result.matched_name}' with confidence {result.confidence.percent}"
+            )
+
+        logger.success(
+            f"Best match for '{name}': '{best_result.matched_name}' with confidence {best_result.confidence.percent}"
+        )
+
+        return best_result
 
     def reconcile(
         self,
@@ -206,7 +265,7 @@ class ModelNameReconciler:
         match_lists: list[pd.Series] | pd.Series,
         match_func: ModelMatchFunction | None = None,
     ) -> Generator[tuple[Hashable, ReconcileResult | None], None, None]:
-        """Main reconciliation process"""
+
         # Normalize inputs
         if not isinstance(match_lists, list):
             match_lists = [match_lists]
@@ -226,6 +285,7 @@ class ModelNameReconciler:
         # Process each input name
         for ix, name in input_list.items():
             logger.info(f"Processing row {ix}: '{name}'")
+
             result = self._reconcile_models_matches(
                 name=name,
                 match_lists_names=match_lists_names,

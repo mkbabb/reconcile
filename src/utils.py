@@ -49,12 +49,12 @@ def strip_response(response: str) -> str:
     return response
 
 
-def handle_response(response: ModelResponse) -> dict[str, list[str]] | None:
+def handle_response(response: ModelResponse) -> dict | None:
     """Handle model response"""
     if not response.choices:
         return None
 
-    content = response.choices[0].message.content # type: ignore
+    content = response.choices[0].message.content  # type: ignore
 
     if content is None:
         return None
