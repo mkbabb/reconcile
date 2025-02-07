@@ -1,7 +1,6 @@
 # Reconciliation Configuration
 google_credentials = "auth/credentials.json"
 
-batch_size = 20
 
 system_prompt = """The input name and match list are school names, districts, etc.
 Wherein SD = school district"""
@@ -13,9 +12,9 @@ include_references = true
 include_input = true
 
 [input_sheet]
-url = "https://docs.google.com/spreadsheets/d/1yIkYi8lb0A_FPoo2DWzcl8s8b613eG74d1KWCvwUgNI/edit?gid=1628843013#gid=1628843013"
-range_name = "Names"
-column_name = "site_name"
+url = "https://docs.google.com/spreadsheets/d/1ck-oLq0ZZcJ5bE25iCniKEbpRH6W8hqOYIGp_0yPk7I/edit?gid=2061681244#gid=2061681244"
+range_name = "Internet"
+column_name = "Customer"
 
 [[reference_sheets]]
 url = "https://docs.google.com/spreadsheets/d/1ck-oLq0ZZcJ5bE25iCniKEbpRH6W8hqOYIGp_0yPk7I/edit?gid=950385915#gid=950385915"
@@ -28,7 +27,14 @@ range_name = "LEA Summary for Pivot"
 column_name = "LEA Name"
 
 
+
+# Add additional reference sheets as needed
+# [[reference_sheets]]
+# url = "..."
+# range_name = "..."
+# column_name = "..."
+
 [output_sheet]
-url = "https://docs.google.com/spreadsheets/d/1yIkYi8lb0A_FPoo2DWzcl8s8b613eG74d1KWCvwUgNI/edit?gid=1628843013#gid=1628843013"
-range_name = "Matched"
-column_name = "site_name"
+url = "https://docs.google.com/spreadsheets/d/1ck-oLq0ZZcJ5bE25iCniKEbpRH6W8hqOYIGp_0yPk7I/edit?gid=2131558729#gid=2131558729"
+range_name = "Matched v2"
+column_name = "Name"
