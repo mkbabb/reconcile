@@ -70,7 +70,7 @@ ModelMatchFunction = Callable[
 ]
 
 
-@cache_with_stale_interval(datetime.timedelta(days=100))
+@cache_with_stale_interval(datetime.timedelta(days=1))
 def find_match(
     input_name: str,
     match_list: list[str],

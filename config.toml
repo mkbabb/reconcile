@@ -1,21 +1,29 @@
 # Reconciliation Configuration
 google_credentials = "auth/credentials.json"
 
-batch_size = 20
+batch_size = 1
 
 system_prompt = """The input name and match list are school names, districts, etc.
 Wherein SD = school district"""
 
 model_name = "gpt-4o"
+# model_name = "o3-mini"
 
 include_references = true
 
-include_input = true
+include_input = false
+
+clear_output = true
 
 [input_sheet]
-url = "https://docs.google.com/spreadsheets/d/1yIkYi8lb0A_FPoo2DWzcl8s8b613eG74d1KWCvwUgNI/edit?gid=1628843013#gid=1628843013"
-range_name = "Names"
-column_name = "site_name"
+url = "https://docs.google.com/spreadsheets/d/1p0X28UMswoxrH9_VqT8YFjsK118qByP9Jnew6Je2LZc/edit?gid=1560048052#gid=1560048052"
+range_name = "Input"
+column_name = "Customer"
+
+[[reference_sheets]]
+url = "https://docs.google.com/spreadsheets/d/1p0X28UMswoxrH9_VqT8YFjsK118qByP9Jnew6Je2LZc/edit?gid=1486894226#gid=1486894226"
+range_name = "DIT Billing Name Mapping v2"
+column_name = "Name"
 
 [[reference_sheets]]
 url = "https://docs.google.com/spreadsheets/d/1ck-oLq0ZZcJ5bE25iCniKEbpRH6W8hqOYIGp_0yPk7I/edit?gid=950385915#gid=950385915"
@@ -29,6 +37,6 @@ column_name = "LEA Name"
 
 
 [output_sheet]
-url = "https://docs.google.com/spreadsheets/d/1yIkYi8lb0A_FPoo2DWzcl8s8b613eG74d1KWCvwUgNI/edit?gid=1628843013#gid=1628843013"
+url = "https://docs.google.com/spreadsheets/d/1p0X28UMswoxrH9_VqT8YFjsK118qByP9Jnew6Je2LZc/edit?gid=1560048052#gid=1560048052"
 range_name = "Matched"
-column_name = "site_name"
+column_name = "Customer"

@@ -26,8 +26,8 @@ python = "^3.12"
 pandas = "^2.2.3"
 loguru = "^0.7.2"
 litellm = "^1.56.8"
-googleapiutils2 = "^0.16.0"
 mypy = "^1.15.0"
+googleapiutils2 = "^0.16.1"
 
 
 [tool.poetry.group.dev.dependencies]

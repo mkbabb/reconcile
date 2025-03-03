@@ -219,13 +219,13 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "cachetools"
-version = "5.5.1"
+version = "5.5.2"
 description = "Extensible memoizing collections and decorators"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "cachetools-5.5.1-py3-none-any.whl", hash = "sha256:b76651fdc3b24ead3c648bbdeeb940c1b04d365b38b4af66788f9ec4a81d42bb"},
-    {file = "cachetools-5.5.1.tar.gz", hash = "sha256:70f238fbba50383ef62e55c6aff6d9673175fe59f7c6782c7a0b9e38f4a9df95"},
+    {file = "cachetools-5.5.2-py3-none-any.whl", hash = "sha256:d26a22bcc62eb95c3beabd9f1ee5e820d3d2704fe2967cbe350e20c8ffcd3f0a"},
+    {file = "cachetools-5.5.2.tar.gz", hash = "sha256:1a661caa9175d26759571b2e19580f9d6393969e5dfca11fdb1f947a23e640d4"},
 ]
 
 [[package]]
@@ -572,13 +572,13 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
 
 [[package]]
 name = "google-api-python-client"
-version = "2.160.0"
+version = "2.162.0"
 description = "Google API Client Library for Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "google_api_python_client-2.160.0-py2.py3-none-any.whl", hash = "sha256:63d61fb3e4cf3fb31a70a87f45567c22f6dfe87bbfa27252317e3e2c42900db4"},
-    {file = "google_api_python_client-2.160.0.tar.gz", hash = "sha256:a8ccafaecfa42d15d5b5c3134ced8de08380019717fc9fb1ed510ca58eca3b7e"},
+    {file = "google_api_python_client-2.162.0-py2.py3-none-any.whl", hash = "sha256:49365fa4f7795fe81a747f5544d6528ea94314fa59664e0ea1005f603facf1ec"},
+    {file = "google_api_python_client-2.162.0.tar.gz", hash = "sha256:5f8bc934a5b6eea73a7d12d999e6585c1823179f48340234acb385e2502e735a"},
 ]
 
 [package.dependencies]
@@ -680,18 +680,18 @@ grpc = ["grpcio (>=1.44.0,<2.0.0.dev0)"]
 
 [[package]]
 name = "googleapiutils2"
-version = "0.16.0"
-description = "Wrapper for Google's Python API."
+version = "0.16.1"
+description = "Wrapper for Google's Python API"
 optional = false
 python-versions = "<4.0,>=3.12"
 files = [
-    {file = "googleapiutils2-0.16.0-py3-none-any.whl", hash = "sha256:a87181391263fb3653a5cd13f37e5674ada4b16ea4a10164189b2ca225fe3d0b"},
-    {file = "googleapiutils2-0.16.0.tar.gz", hash = "sha256:ddaa2fd9e1db4723dd0e67948ede709bfa3ceaea1d0df7c7a1b7153c444aaf42"},
+    {file = "googleapiutils2-0.16.1-py3-none-any.whl", hash = "sha256:013d74a301b8f3dd31bd4ca38c00c14177d1e8b0fff7578e9446365da52f6acc"},
+    {file = "googleapiutils2-0.16.1.tar.gz", hash = "sha256:3df43e6e2908e45307c7f7b41542dc7fcf88d7bbbcae5be48132bdff92ed3b6a"},
 ]
 
 [package.dependencies]
-cachetools = ">=5.5.1,<6.0.0"
-google-api-python-client = ">=2.160.0,<3.0.0"
+cachetools = ">=5.5.2,<6.0.0"
+google-api-python-client = ">=2.162.0,<3.0.0"
 google-api-python-client-stubs = ">=1.29.0,<2.0.0"
 google-auth = ">=2.38.0,<3.0.0"
 google-auth-httplib2 = ">=0.2.0,<0.3.0"
@@ -2541,4 +2541,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "0c13dbe84ef0843542490e2d168585c1366709ee692aa18d22d8a420806aa8b4"
+content-hash = "4fcd7dc62f47e129922505be1712d3cc236b8229402686312c5d398ebecab552"
